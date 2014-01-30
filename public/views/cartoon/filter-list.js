@@ -1,14 +1,4 @@
 define(['views/base', 'backbone', 'underscore', 'lib/form', 'fabric', 'stackblur', './dodge', 'tpl!./filter-list'], function (View, B, _, form, fabric, StackBlur, Dodge, template) {
-
-    var filterTemplate = _.template('<div class="form-group">\
-       <label for="<%=cid%>" class="col-sm-2 control-label"><%=name%></label>\
-       <div class="col-sm-10">\
-         <div id="<%=cid%>"></div>\
-          <div id="children<%=cid%>"></div>\
-         <p class="help-block"><%=help%></p>\
-       </div>\
-       </div>\
-    ');
     var itemTemplate = _.template('<div class="form-group">\
        <label for="<%=cid%>" class="col-sm-2 control-label"><%=name%></label>\
        <div class="col-sm-10">\
@@ -35,7 +25,7 @@ define(['views/base', 'backbone', 'underscore', 'lib/form', 'fabric', 'stackblur
         </div>\
     </form>');
     var invoke = function (obj, property, args) {
-        var args = Array.prototype.slice(2, arguments);
+        var args = Array.prototype.slice.call(arguments,2);
         return _.compact(_.map(obj, function (v) {
             if (typeof v[property] === 'function') {
                 return v[property].apply(v, args);
@@ -49,25 +39,12 @@ define(['views/base', 'backbone', 'underscore', 'lib/form', 'fabric', 'stackblur
         help: '',
         children: [],
         itemTemplate: itemTemplate,
-        createFilter: function (imageData, canvas) {
-            var data = form.toObject(this.$el.parents('form'));
-            var Filter = this.filter;
-            return new Filter(data);
-        },
-        setImage: function (img) {
-            invoke(this.views, 'setImage', img);
-            this.imageData = img;
-        },
+
         initialize: function (o) {
             View.prototype.initialize.call(this, o);
             this.views = {};
         },
-        wrap: function (children) {
-            return children.join('\n');
-        },
-        _children: function () {
-            return this.wrap(_.map(this.children, this.createChild, this));
-        },
+
         createChild: function (child) {
             var c = new child();
             c.parent = this;
@@ -105,6 +82,16 @@ define(['views/base', 'backbone', 'underscore', 'lib/form', 'fabric', 'stackblur
             delete this.parent;
             this.$el.remove();
             return View.prototype.remove.call(this);
+        },
+        createFilter: function (imageData, canvas) {
+            var data = form.toObject(this.$el.parents('form'));
+            data.imageData = imageData;
+            var Filter = this.filter;
+            return new Filter(data);
+        },
+        setImage: function (img) {
+            invoke(this.views, 'setImage', img);
+            this.imageData = img;
         }
     })
 

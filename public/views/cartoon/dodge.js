@@ -16,9 +16,9 @@ define(['fabric', 'pusher', 'color-thief'], function (fabric, pusher, ColorThief
             var context = canvasEl.getContext('2d'),
                 imageData = context.getImageData(0, 0, canvasEl.width, canvasEl.height),
                 dodge = imageData.data,
-                base = this.orig
+                base = this.imageData.data
                 ;
-            var cmap = this.cmap || new ColorThief().getPaletteCmap(imageData, this.paletteSize, this.quality);
+            var cmap = this.cmap || (this.cmap = new ColorThief().getPaletteCmap(imageData, this.paletteSize, this.quality));
             _.each(cmap.palette(), function (rgb) {
                 $('<div style="height:20px;width:20px;float:left"></div>').css({'background-color': 'rgb(' + rgb.join(',') + ')'}).appendTo(this);
             }, $('.palette').empty());
